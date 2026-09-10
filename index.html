@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hidden Relay Test Client</title>
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>🛰️</text></svg>">
+</head>
+<body>
+<div class="page">
+
+  <header>
+    <h1>Hidden relay test client</h1>
+    <p class="lede">
+      Publishes a kind 1 note through a hidden relay and reads your own notes back.
+      Everything runs in this page: no build step, no server, no dependencies.
+    </p>
+  </header>
+
+  <section class="card">
+    <h2>1. Connect</h2>
+    <div class="field">
+      <label for="nsec">Your secret key</label>
+      <div class="with-button">
+        <input id="nsec" type="password" autocomplete="off" spellcheck="false"
+               placeholder="nsec1… or 64 hex characters">
+        <button id="toggle-nsec" type="button" class="ghost" aria-label="Show or hide the key">show</button>
+      </div>
+      <p class="hint">Use a throwaway key. It has to be whitelisted on the bridge.</p>
+    </div>
+
+    <div class="field">
+      <label for="nrv">Hidden relay address</label>
+      <input id="nrv" type="text" autocomplete="off" spellcheck="false" placeholder="nrv1…">
+      <p class="hint">The <code>nrv1…</code> address carries the bridge pubkey and its rendez-vous relays.</p>
+    </div>
+
+    <details class="advanced">
+      <summary>Advanced</summary>
+      <div class="field">
+        <label for="relay-override">Rendez-vous relay override</label>
+        <input id="relay-override" type="text" autocomplete="off" spellcheck="false"
+               placeholder="wss://relay.example.com (defaults to the one in the nrv address)">
+      </div>
+      <label class="checkbox">
+        <input id="remember" type="checkbox">
+        <span>Remember these inputs in this browser, including the secret key</span>
+      </label>
+    </details>
+
+    <div class="actions">
+      <button id="connect" type="button" class="primary">Connect</button>
+      <button id="disconnect" type="button" disabled>Disconnect</button>
+      <span id="status" class="status status-idle">not connected</span>
+    </div>
+
+    <dl id="identity" class="identity" hidden>
+      <dt>You</dt><dd id="my-npub"></dd>
+      <dt>Hidden relay</dt><dd id="bridge-npub"></dd>
+      <dt>Rendez-vous</dt><dd id="relay-url"></dd>
+    </dl>
+  </section>
+
+  <section class="card" id="compose-card" aria-disabled="true">
+    <h2>2. Publish a note</h2>
+    <div class="field">
+      <label for="content">Content of the kind 1 note</label>
+      <textarea id="content" rows="4" placeholder="hello from behind the bridge"></textarea>
+    </div>
+    <div class="actions">
+      <button id="publish" type="button" class="primary" disabled>Publish through the bridge</button>
+      <span id="publish-status" class="status"></span>
+    </div>
+  </section>
+
+  <section class="card" id="notes-card" aria-disabled="true">
+    <div class="card-head">
+      <h2>3. Your notes</h2>
+      <button id="refresh" type="button" disabled>Refresh</button>
+    </div>
+    <p class="hint">
+      Runs <code>REQ {"kinds":[1],"authors":[your pubkey]}</code> through the bridge
+      against the relay on the far side.
+    </p>
+    <ul id="notes" class="notes"></ul>
+    <p id="notes-empty" class="empty">Nothing fetched yet.</p>
+  </section>
+
+  <section class="card log-card">
+    <div class="card-head">
+      <h2>Protocol log</h2>
+      <button id="clear-log" type="button">Clear</button>
+    </div>
+    <pre id="log" class="log" aria-live="polite"></pre>
+  </section>
+
+  <footer>
+    <p>
+      Test client for the
+      <a href="https://github.com/paulle0/hidden_relay_nip">hidden relay NIP</a>.
+      Kind 27901 payloads are NIP-44 v2 encrypted between you and the bridge.
+    </p>
+  </footer>
+
+</div>
+
+<script src="js/crypto.js"></script>
+<script src="js/nostr.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
